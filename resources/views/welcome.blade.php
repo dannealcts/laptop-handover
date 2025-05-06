@@ -13,7 +13,8 @@
         {{-- 🔖 Title & Tagline --}}
         <h1 class="text-3xl font-bold mb-4">💻 Laptop Handover System</h1>
         <p class="mb-6 text-lg">
-            Welcome to the internal asset management platform for staff and admin.
+            <!--Welcome to the internal asset management platform for staff and admin.-->
+            Welcome to Celcom Timur Sabah Asset Management Portal. Securely manage and track company-issued devices.
         </p>
 
         {{-- 🔐 Auth Options --}}
