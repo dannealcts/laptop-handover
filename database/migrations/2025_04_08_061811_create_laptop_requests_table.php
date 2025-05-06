@@ -1,0 +1,36 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+{
+    Schema::create('laptop_requests', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('user_id')->constrained()->onDelete('cascade');
+        $table->enum('type', ['new', 'replacement', 'upgrade']);
+        $table->enum('replacement_part', ['battery', 'keyboard', 'motherboard', 'screen', 'charger', 'laptop', 'others'])->nullable();
+        $table->enum('upgrade_type', ['memory', 'processor', 'hard_disk'])->nullable();
+        $table->text('justification');
+        $table->string('other_replacement')->nullable();
+        $table->string('other_justification')->nullable();
+        $table->string('status')->default('pending'); // e.g. pending, approved, rejected
+        $table->timestamps();
+    });
+}
+
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('laptop_requests');
+    }
+};
