@@ -7,7 +7,7 @@
 
         <!-- Main Content -->
         <main class="flex-1 p-8 bg-white shadow-md rounded-lg mx-8 my-6">
-            <h2 class="text-2xl font-bold mb-6 text-gray-800">Export Staff Laptop Request</h2>
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">Export Requests</h2>
 
             <!-- Search Form -->
             <form method="POST" action="{{ route('admin.export-request.search') }}" class="mb-6 flex items-center gap-4" @submit="loading = true">
