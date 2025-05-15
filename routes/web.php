@@ -11,10 +11,6 @@ use App\Http\Controllers\{
     HandoverHistoryController
 };
 
-Route::get('/git-test', function () {
-    return view('git-test');
-});
-
 /*
 |--------------------------------------------------------------------------
 | 🌐 GENERAL ROUTES
