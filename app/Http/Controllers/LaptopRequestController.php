@@ -10,6 +10,8 @@ use App\Models\AccessoryAssignment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use App\Models\User;
+use Carbon\Carbon;
 
 class LaptopRequestController extends Controller
 {
@@ -226,9 +228,30 @@ class LaptopRequestController extends Controller
     }
 
     /** Show Export Form */
-    public function exportForm()
+    public function exportForm(Request $request)
     {
-        return view('admin.laptops.export-request');
+        $staffList = User::where('role', 'staff')->get();
+        $requests = [];
+
+        if ($request->filled(['start_date', 'end_date'])) {
+            $start = Carbon::parse($request->start_date)->startOfDay();
+            $end = Carbon::parse($request->end_date)->endOfDay();
+        
+            $query = LaptopRequest::with(['user', 'laptop', 'accessories'])
+                ->whereBetween('created_at', [$start, $end])
+                ->whereIn('status', ['approved', 'completed']);
+        
+            if ($request->filled('staff_ids')) {
+                $query->whereIn('user_id', $request->staff_ids);
+            }
+        
+            $requests = $query->get();
+        }        
+
+        return view('admin.laptops.export-request', [
+            'staffList' => $staffList,
+            'requests' => $requests,
+        ]);
     }
 
     /** Search Staff for Export */
@@ -247,6 +270,85 @@ class LaptopRequestController extends Controller
         $requests = LaptopRequest::with('laptop')->where('user_id', $staff->id)->whereIn('status', ['approved', 'completed'])->get();
 
         return view('admin.laptops.export-request', compact('staff', 'requests'));
+    }
+
+    // Select Staff To Export
+    public function exportSelected(Request $request)
+    {
+        $request->validate([
+            'selected_requests' => 'required|array',
+            'selected_requests.*' => 'exists:laptop_requests,id',
+        ]);
+
+        $requests = LaptopRequest::with(['user', 'laptop', 'accessories'])
+            ->whereIn('id', $request->selected_requests)
+            ->get();
+
+        if ($requests->isEmpty()) {
+            return back()->with('error', 'No selected requests found.');
+        }
+
+        $spreadsheet = IOFactory::load(storage_path('app/templates/PURCHASE REQUISITION FORM.xlsx'));
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $grouped = $requests->groupBy(function ($req) {
+            return implode('|', [
+                $req->type,
+                $req->laptop?->brand,
+                $req->laptop?->model,
+                $req->assigned_part,
+                $req->upgrade_type,
+                $req->replacement_part,
+            ]);
+        });
+
+        $row = 18;
+        $itemIndex = 1;
+
+        foreach ($grouped as $group) {
+            $first = $group->first();
+            $staffNames = $group->pluck('user.name')->join(', ');
+
+            // Collect unique accessories
+            $accessoryText = collect();
+            foreach ($group as $req) {
+                if ($req->accessories && $req->accessories->isNotEmpty()) {
+                    $accessoryText = $accessoryText->merge($req->accessories->map(function ($a) {
+                        return $a->accessory_name . ' (x' . $a->quantity . ')';
+                    }));
+                }
+            }
+            $accessoryStr = $accessoryText->unique()->implode(', ');
+
+            $item = $this->getExportItemDescription($first);
+            $mainLine = trim($item . ($accessoryStr ? ", $accessoryStr" : ''));
+            $descriptionWithNames = "$mainLine – $staffNames";
+
+            // Row 1: Item line with requester names
+            $sheet->setCellValue("B{$row}", $itemIndex);
+            $sheet->setCellValue("C{$row}", $descriptionWithNames);
+            $sheet->setCellValue("J{$row}", $group->count());
+            $sheet->setCellValue("K{$row}", 'Unit');
+
+            // Row 2: Specification
+            $row++;
+            $sheet->setCellValue("C{$row}", $this->getLaptopSpecsText($first));
+
+            $row++;
+            $itemIndex++;
+        }
+
+        // Optional: Admin remark
+        $adminRemark = $request->input('remark') ?? '-';
+        $sheet->setCellValue('D30', $adminRemark);
+
+        $filename = 'FD-F04-SELECTED-' . now()->format('Ymd-His') . '.xlsx';
+        $filepath = storage_path("app/public/exports/{$filename}");
+
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save($filepath);
+
+        return response()->download($filepath)->deleteFileAfterSend(true);
     }
 
     /** Export Staff Request to Excel */
@@ -282,9 +384,115 @@ class LaptopRequestController extends Controller
             $sheet->setCellValue("K{$row}", 'Unit');
         }
 
-        $sheet->setCellValue('D30', $remark);
+        $sheet->setCellValue('D30', $remark ?: '-');
 
         $filename = 'FD-F04-' . now()->format('Ymd-His') . '.xlsx';
+        $filepath = storage_path("app/public/exports/{$filename}");
+
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save($filepath);
+
+        return response()->download($filepath)->deleteFileAfterSend(true);
+    }
+
+    protected function getLaptopSpecsText($request)
+    {
+        if ($request->type === 'new' && $request->laptop) {
+            return $request->laptop->specs ?? '-';
+        }
+
+        return '-';
+    }
+
+    public function exportAllFiltered(Request $request)
+    {
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+        ]);
+
+        $start = Carbon::parse($request->start_date)->startOfDay();
+        $end = Carbon::parse($request->end_date)->endOfDay();
+
+        $query = LaptopRequest::with(['user', 'laptop', 'accessories'])
+            ->whereBetween('created_at', [$start, $end])
+            ->whereIn('status', ['approved', 'completed']);
+
+        if ($request->filled('staff_ids')) {
+            $query->whereIn('user_id', $request->staff_ids);
+        }
+
+        $requests = $query->get();
+
+        if ($requests->isEmpty()) {
+            return back()->with('error', 'No requests found for the selected range.');
+        }
+
+        // Group by specs
+        $grouped = $requests->groupBy(function ($req) {
+            return implode('|', [
+                $req->type,
+                $req->laptop?->brand,
+                $req->laptop?->model,
+                $req->assigned_part,
+                $req->upgrade_type,
+                $req->replacement_part,
+            ]);
+        });
+
+        // Load template
+        $spreadsheet = IOFactory::load(storage_path('app/templates/PURCHASE REQUISITION FORM.xlsx'));
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $row = 18;
+        $itemIndex = 1;
+
+        $remark = $request->input('remark') ?? '-';
+
+
+        foreach ($grouped as $group) {
+            $first = $group->first();
+
+            $staffNames = $group->pluck('user.name')->join(', ');
+
+            $accessoryText = collect();
+            foreach ($group as $req) {
+                if ($req->accessories && $req->accessories->isNotEmpty()) {
+                    $accessoryText = $accessoryText->merge($req->accessories->map(function ($a) {
+                        return $a->accessory_name . ' (x' . $a->quantity . ')';
+                    }));
+                }
+            }
+            $accessoryStr = $accessoryText->unique()->implode(', ');
+
+            $item = $this->getExportItemDescription($first);
+            $fullItem = $accessoryStr ? "$item, $accessoryStr" : $item;
+
+            // Format item row
+            $staffNames = $group->pluck('user.name')->join(', ');
+            $descriptionWithNames = "$item – $staffNames";
+
+            // Add item line
+            $sheet->setCellValue("B{$row}", $itemIndex);
+            $sheet->setCellValue("C{$row}", $descriptionWithNames);
+            $sheet->setCellValue("J{$row}", $group->count());
+            $sheet->setCellValue("K{$row}", 'Unit');
+
+            // Add second line: specification
+            $sheet->setCellValue("C{$row}", $this->getLaptopSpecsText($first));
+            $row++;
+            $itemIndex++;
+            
+            //$remark .= "\nItem $itemIndex – Requested by: $staffNames";
+        }
+
+        // Push everything below down — insert space above row 30
+        $sheet->insertNewRowBefore(30, $row - 30 + 3); // 3 buffer rows
+
+        // Then drop the remark to new row
+        $sheet->setCellValue('D' . ($row + 2), $remark);
+
+        $filename = 'FD-F04-GROUPED-' . now()->format('Ymd-His') . '.xlsx';
         $filepath = storage_path("app/public/exports/{$filename}");
 
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');

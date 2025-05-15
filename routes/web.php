@@ -90,6 +90,10 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
     Route::get('/export-request', [LaptopRequestController::class, 'exportForm'])->name('export-request.form');
     Route::post('/export-request/search', [LaptopRequestController::class, 'searchStaff'])->name('export-request.search');
     Route::post('/export-request/export/{userId}', [LaptopRequestController::class, 'exportToExcel'])->name('export-request.generate');
+    Route::get('/export-requests', [LaptopRequestController::class, 'exportForm'])->name('export.form'); // New Line
+    Route::post('/export-selected', [LaptopRequestController::class, 'exportSelected'])->name('export.selected');
+    Route::post('/export-all', [LaptopRequestController::class, 'exportAllFiltered'])->name('export.all');
+
 
     // Optional redirect
     Route::get('/export-request-redirect', function () {
