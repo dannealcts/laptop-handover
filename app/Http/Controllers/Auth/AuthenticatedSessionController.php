@@ -47,7 +47,15 @@ class AuthenticatedSessionController extends Controller
     }
 
     // Fallback
-    return redirect()->intended(RouteServiceProvider::HOME);
+    // Logout and block access if no valid role
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return redirect('/login')->withErrors([
+        'email' => 'Unauthorized role. Please contact admin.',
+    ]);
+
 }
 
     /**

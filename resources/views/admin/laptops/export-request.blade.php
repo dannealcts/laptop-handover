@@ -23,7 +23,7 @@
 
                 <div>
                     <label class="block mb-1 text-sm font-medium">Select Users:</label>
-                    <select name="staff_ids[]" multiple class="w-full border-gray-300 rounded-md shadow-sm">
+                    <select id="staff_ids" name="staff_ids[]" multiple class="w-full border-gray-300 rounded-md shadow-sm">
                         @foreach ($staffList as $user)
                             <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
                         @endforeach
@@ -129,84 +129,82 @@
                     </defs>
                 </svg>
             </div>
+            @push('styles')
+            <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
-            <!-- Staff Request Preview -->
-            <!--@if(isset($staff))
-                <div class="mb-6 bg-white p-4 rounded shadow">
-                    <h3 class="text-lg font-semibold mb-2">Staff: {{ $staff->name }} ({{ $staff->email }})</h3>
+            <style>
+            /* ============================
+            Select2 Styling to Match Tailwind Inputs
+            ============================ */
+            .select2-container--default .select2-selection--multiple {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                min-height: 2.5rem;
+                padding: 0.5rem 0.75rem; /* px-3 py-2 */
+                font-size: 0.875rem;     /* text-sm */
+                font-weight: 400;
+                line-height: 1.25rem;
+                border: 1px solid #d1d5db; /* border-gray-300 */
+                border-radius: 0.375rem;   /* rounded-md */
+                background-color: #fff;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* shadow-sm */
+                transition: border-color 0.2s, box-shadow 0.2s;
+            }
 
-                    Inspection
+            /* Active/focus state */
+            .select2-container--default .select2-selection--multiple:hover,
+            .select2-container--default .select2-selection--multiple:focus-within {
+                border-color: #2563eb; /* blue-600 */
+                box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+            }
 
-                    <table class="w-full table-auto text-sm mb-4">
-                        <thead class="bg-gray-200">
-                            <tr>
-                                <th class="px-3 py-2 text-left">Item</th>
-                                <th class="px-3 py-2 text-left">Type</th>
-                                <th class="px-3 py-2 text-left">Qty</th>
-                                <th class="px-3 py-2 text-left">Unit</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($requests as $req)
-                                <tr class="border-b">
-                                    <td class="px-3 py-2">
-                                        @if($req->type === 'new' && $req->laptop)
-                                            {{ $req->laptop->brand }} {{ $req->laptop->model }}
-                                        @elseif(in_array($req->type, ['replacement', 'upgrade']) && $req->replacement_part !== 'Laptop')
-                                            {{ $req->assigned_part ?? 'Not assigned' }}
-                                        @else
-                                            -
-                                        @endif
+            /* Tag pills */
+            .select2-container--default .select2-selection__choice {
+                background-color: #e5e7eb; /* gray-200 */
+                border: none;
+                color: #1f2937;            /* gray-800 */
+                font-size: 0.875rem;
+                padding: 4px 10px;
+                border-radius: 0.375rem;
+                font-weight: 500;
+                margin: 3px 4px 3px 0;
+            }
 
-                                        {{-- Accessories List --}}
-                                        @if ($req->accessories && $req->accessories->isNotEmpty())
-                                            <ul class="text-xs text-gray-600 mt-1 list-disc list-inside">
-                                                @foreach ($req->accessories as $acc)
-                                                    <li>{{ $acc->accessory_name }} (x{{ $acc->quantity }})</li>
-                                                @endforeach
-                                            </ul>
-                                        @endif
-                                    </td>
-                                    <td class="px-3 py-2 capitalize">
-                                        @if($req->type === 'new')
-                                            Laptop
-                                        @elseif($req->type === 'replacement')
-                                            Replacement
-                                        @elseif($req->type === 'upgrade')
-                                            Upgrade
-                                        @else
-                                            -
-                                        @endif
-                                    </td>
-                                    <td class="px-3 py-2">
-                                        {{ $req->assigned_quantity ?? 1 }}
-                                    </td>
-                                    <td class="px-3 py-2">
-                                        @if($req->type === 'new')
-                                            Unit
-                                        @elseif(in_array($req->type, ['replacement', 'upgrade']))
-                                            Piece
-                                        @else
-                                            -
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+            /* Search input inside */
+            .select2-container--default .select2-selection--multiple .select2-search__field {
+                font-size: 0.875rem;
+                font-weight: 400;
+                padding: 0;
+                margin: 0;
+                min-width: 120px;
+                border: none !important;
+                outline: none !important;
+                background-color: transparent;
+                line-height: 1.25rem;
+                flex-grow: 1;
+            }
 
-                    <form action="{{ route('admin.export-request.generate', $staff->id) }}" method="POST">
-                        @csrf
-                        <div class="mb-4">
-                            <label class="block mb-2 font-medium">Admin Remark:</label>
-                            <textarea name="remark" rows="3" class="w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
-                        </div>
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded">
-                            Export to Excel
-                        </button>
-                    </form>
-                </div>
-            @endif-->
+            /* Ensure full width & visibility */
+            .select2-container {
+                width: 100% !important;
+                z-index: 9999 !important;
+            }
+            </style>
+            @endpush
+
+            @push('scripts')
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- 👈 jQuery must come first -->
+            <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    $('#staff_ids').select2({
+                        placeholder: "Select users...",
+                        width: '100%'
+                    });
+                });
+            </script>
+            @endpush
         </main>
     </div>
 </x-app-layout>
