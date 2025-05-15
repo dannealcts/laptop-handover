@@ -10,10 +10,10 @@
 
     {{-- 🖥️ Welcome Card --}}
     <div class="text-center px-6 py-12 bg-blue-100 shadow-md rounded-lg max-w-xl w-full">
+        
         {{-- 🔖 Title & Tagline --}}
         <h1 class="text-3xl font-bold mb-4">💻 Laptop Handover System</h1>
         <p class="mb-6 text-lg">
-            <!--Welcome to the internal asset management platform for staff and admin.-->
             Welcome to Celcom Timur Sabah Asset Management Portal. Securely manage and track company-issued devices.
         </p>
 
@@ -21,19 +21,22 @@
         @if (Route::has('login'))
             <div class="space-x-4">
                 @auth
-                    {{-- Already logged in --}}
-                    <a href="{{ url('/dashboard') }}"
+                    @php
+                        $user = Auth::user();
+                        $redirectUrl = $user->role === 'admin' ? route('admin.dashboard') :
+                                       ($user->role === 'staff' ? route('staff.dashboard') : route('logout'));
+                    @endphp
+
+                    <a href="{{ $redirectUrl }}"
                        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
                         Go to Dashboard
                     </a>
                 @else
-                    {{-- Login Button --}}
                     <a href="{{ route('login') }}"
                        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
                         Login
                     </a>
 
-                    {{-- Register Button --}}
                     @if (Route::has('register'))
                         <a href="{{ route('register') }}"
                            class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition">
