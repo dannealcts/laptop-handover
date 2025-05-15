@@ -10,16 +10,111 @@
             <h2 class="text-2xl font-bold mb-6 text-gray-800">Export Requests</h2>
 
             <!-- Search Form -->
-            <form method="POST" action="{{ route('admin.export-request.search') }}" class="mb-6 flex items-center gap-4" @submit="loading = true">
-                @csrf
-                <input type="text" name="keyword" placeholder="Search by name or email..." value="{{ old('keyword') }}"
-                    class="w-1/3 rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                    Search
-                </button>
+            <form method="GET" action="{{ route('admin.export.form') }}" class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4" @submit="loading = true">
+                <div>
+                    <label class="block mb-1 text-sm font-medium">Start Date:</label>
+                    <input type="date" name="start_date" class="w-full border-gray-300 rounded-md shadow-sm" required>
+                </div>
+
+                <div>
+                    <label class="block mb-1 text-sm font-medium">End Date:</label>
+                    <input type="date" name="end_date" class="w-full border-gray-300 rounded-md shadow-sm" required>
+                </div>
+
+                <div>
+                    <label class="block mb-1 text-sm font-medium">Select Users:</label>
+                    <select name="staff_ids[]" multiple class="w-full border-gray-300 rounded-md shadow-sm">
+                        @foreach ($staffList as $user)
+                            <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="md:col-span-3">
+                    <label class="block mb-1 text-sm font-medium">Export Mode:</label>
+                    <select name="export_mode" class="w-full border-gray-300 rounded-md shadow-sm" required>
+                        <option value="all_filtered">All filtered (grouped)</option>
+                        <option value="selected_ids">Only selected request IDs</option>
+                    </select>
+                </div>
+
+                <div class="md:col-span-3 text-right">
+                    <button type="submit" class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700">
+                        Filter Requests
+                    </button>
+                </div>
             </form>
 
-            <!-- Spinner Centered -->
+            @if(request('export_mode') === 'all_filtered' && isset($requests) && count($requests) > 0)
+            <form method="POST" action="{{ route('admin.export.all') }}" class="mb-6">
+                @csrf
+                <!-- Keep date range -->
+                <input type="hidden" name="start_date" value="{{ request('start_date') }}">
+                <input type="hidden" name="end_date" value="{{ request('end_date') }}">
+
+                <!-- Pass staff IDs if selected -->
+                @foreach(request('staff_ids', []) as $id)
+                    <input type="hidden" name="staff_ids[]" value="{{ $id }}">
+                @endforeach
+
+                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2 rounded">
+                    Export All (Grouped)
+                </button>
+            </form>
+            @endif
+
+            <!-- Display Request List with Checkboxes -->
+            @if(isset($requests) && count($requests) > 0)
+            <form method="POST" action="{{ route('admin.export.selected') }}">
+                @csrf
+
+                <table class="w-full text-sm mb-6 border">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-3 py-2">Select</th>
+                            <th class="px-3 py-2">Request ID</th>
+                            <th class="px-3 py-2">User</th>
+                            <th class="px-3 py-2">Laptop/Part</th>
+                            <th class="px-3 py-2">Type</th>
+                            <th class="px-3 py-2">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($requests as $req)
+                        <tr class="border-b">
+                            <td class="px-3 py-2">
+                                <input type="checkbox" name="selected_requests[]" value="{{ $req->id }}">
+                            </td>
+                            <td class="px-3 py-2">{{ $req->id }}</td>
+                            <td class="px-3 py-2">{{ $req->user->name }}</td>
+                            <td class="px-3 py-2">
+                                @if($req->type === 'new' && $req->laptop)
+                                    {{ $req->laptop->brand }} {{ $req->laptop->model }}
+                                @elseif(in_array($req->type, ['replacement', 'upgrade']))
+                                    {{ $req->assigned_part ?? '-' }}
+                                @else
+                                    -
+                                @endif
+                            </td>
+                            <td class="px-3 py-2 capitalize">{{ $req->type }}</td>
+                            <td class="px-3 py-2">{{ $req->created_at->format('d M Y') }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+
+                <div class="mb-4">
+                    <label class="block mb-2 font-medium">Admin Remark:</label>
+                    <textarea name="remark" rows="3" class="w-full border border-gray-300 rounded-md shadow-sm"></textarea>
+                </div>
+
+                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-medium px-5 py-2 rounded">
+                    Export Selected Requests
+                </button>
+            </form>
+            @endif
+
+            <!-- Spinner Loading Effect -->
             <div x-show="loading" class="fixed inset-0 flex items-center justify-center bg-white bg-opacity-50 z-50">
                 <svg class="animate-spin h-16 w-16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="50" cy="50" r="35" stroke-width="10" fill="none" stroke="url(#rainbow)" stroke-dasharray="180" stroke-linecap="round"></circle>
@@ -36,9 +131,11 @@
             </div>
 
             <!-- Staff Request Preview -->
-            @if(isset($staff))
+            <!--@if(isset($staff))
                 <div class="mb-6 bg-white p-4 rounded shadow">
                     <h3 class="text-lg font-semibold mb-2">Staff: {{ $staff->name }} ({{ $staff->email }})</h3>
+
+                    Inspection
 
                     <table class="w-full table-auto text-sm mb-4">
                         <thead class="bg-gray-200">
@@ -98,7 +195,6 @@
                         </tbody>
                     </table>
 
-                    <!-- Admin Remark -->
                     <form action="{{ route('admin.export-request.generate', $staff->id) }}" method="POST">
                         @csrf
                         <div class="mb-4">
@@ -110,7 +206,7 @@
                         </button>
                     </form>
                 </div>
-            @endif
+            @endif-->
         </main>
     </div>
 </x-app-layout>
