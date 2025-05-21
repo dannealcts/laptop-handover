@@ -16,7 +16,7 @@
                 <!-- Action Cards Grid -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     <!-- Make a Request -->
-                    <a href="{{ route('staff.request-laptop.create') }}"
+                    <a href="{{ route('staff.make-request.create') }}"
                        class="bg-green-600 hover:bg-green-700 text-white font-semibold py-6 px-4 rounded-xl text-center shadow-md hover:shadow-xl transition transform hover:-translate-y-1">
                         <div class="flex flex-col items-center">
                             <i data-lucide="plus" class="w-6 h-6 mb-2"></i>

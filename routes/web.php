@@ -117,8 +117,8 @@ Route::prefix('staff')->middleware(['auth', 'verified'])->name('staff.')->group(
     })->name('dashboard');
 
     // Laptop Request
-    Route::get('/request-laptop', [LaptopRequestController::class, 'create'])->name('request-laptop.create');
-    Route::post('/request-laptop', [LaptopRequestController::class, 'store'])->name('request-laptop.store');
+    Route::get('/make-request', [LaptopRequestController::class, 'create'])->name('make-request.create');
+    Route::post('/make-request', [LaptopRequestController::class, 'store'])->name('make-request.store');
 
     // My Requests
     Route::get('/my-requests', [HandoverHistoryController::class, 'myHistory'])->name('my-requests');
