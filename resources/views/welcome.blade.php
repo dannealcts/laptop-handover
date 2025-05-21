@@ -6,20 +6,24 @@
     <title>Laptop Handover System</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-white text-gray-800 flex items-center justify-center min-h-screen">
+<body class="min-h-screen bg-white flex items-center justify-center font-sans">
+    <div class="bg-blue-50 shadow-lg rounded-2xl w-full max-w-2xl p-10">
+        <!-- Header -->
+        <div class="flex items-center space-x-4 mb-6">
+            <img src="/images/logo.png" alt="Company Logo" class="max-h-12 object-contain">
+            <div>
+                <h1 class="text-xl font-semibold text-gray-800">Celcom Timur Sabah IT Dept</h1>
+                <p class="text-sm text-gray-500">Asset Management Portal</p>
+            </div>
+        </div>
 
-    {{-- 🖥️ Welcome Card --}}
-    <div class="text-center px-6 py-12 bg-blue-100 shadow-md rounded-lg max-w-xl w-full">
-        
-        {{-- 🔖 Title & Tagline --}}
-        <h1 class="text-3xl font-bold mb-4">💻 Laptop Handover System</h1>
-        <p class="mb-6 text-lg">
-            Welcome to Celcom Timur Sabah Asset Management Portal. Securely manage and track company-issued devices.
-        </p>
+        <!-- Title -->
+        <h2 class="text-3xl font-bold text-gray-800 mb-2">Laptop Handover System</h2>
+        <p class="text-gray-600 mb-8 text-base">Securely manage and track company-issued devices.</p>
 
-        {{-- 🔐 Auth Options --}}
+        <!-- Auth Buttons -->
         @if (Route::has('login'))
-            <div class="space-x-4">
+            <div class="flex flex-col space-y-4">
                 @auth
                     @php
                         $user = Auth::user();
@@ -28,18 +32,18 @@
                     @endphp
 
                     <a href="{{ $redirectUrl }}"
-                       class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                       class="bg-blue-600 hover:bg-blue-700 text-white text-center py-3 rounded-md font-medium">
                         Go to Dashboard
                     </a>
                 @else
                     <a href="{{ route('login') }}"
-                       class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                       class="bg-green-600 hover:bg-green-700 text-white text-center py-3 rounded-md font-medium">
                         Login
                     </a>
 
                     @if (Route::has('register'))
                         <a href="{{ route('register') }}"
-                           class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition">
+                        class="bg-gray-700 text-white text-center py-3 rounded-md font-medium hover:bg-gray-800">
                             Register
                         </a>
                     @endif
@@ -47,13 +51,8 @@
             </div>
         @endif
 
-        {{-- 🧾 Footer --}}
-        <div class="mt-8">
-            <p class="text-sm text-gray-600">
-                © {{ date('Y') }} Celcom Timur Sabah IT Dept.
-            </p>
-        </div>
+        <!-- Footer -->
+        <p class="mt-10 text-xs text-center text-gray-400">&copy; {{ date('Y') }} Celcom Timur Sabah IT Department – v1.0</p>
     </div>
-
 </body>
 </html>
