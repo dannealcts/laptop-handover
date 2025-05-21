@@ -1,36 +1,35 @@
 <x-app-layout>
     <div class="flex min-h-screen" x-data="{ loading: false }">
-        
         @php $currentRoute = Route::currentRouteName(); @endphp
 
         @include('components.admin-sidebar')
 
         <!-- Main Content -->
-        <main class="flex-1 p-8 bg-white shadow-md rounded-lg mx-8 my-6">
+        <main class="flex-1 p-8 bg-gray-50 mx-8 my-6 rounded-lg">
             <h2 class="text-2xl font-semibold text-gray-800 mb-6">All Staff Requests</h2>
 
             @if (session('success'))
-                <div class="bg-green-100 text-green-800 p-3 rounded mb-4">{{ session('success') }}</div>
+                <div class="bg-green-100 text-green-800 p-3 rounded mb-4 shadow-sm">{{ session('success') }}</div>
             @endif
 
             @if (session('error'))
-                <div class="bg-red-100 text-red-800 p-3 rounded mb-4">{{ session('error') }}</div>
+                <div class="bg-red-100 text-red-800 p-3 rounded mb-4 shadow-sm">{{ session('error') }}</div>
             @endif
 
             <!-- Filter -->
-            <form method="GET" action="{{ route('admin.view-staff-requests') }}" class="mb-4 flex items-center gap-3" @submit="loading = true">
+            <form method="GET" action="{{ route('admin.view-staff-requests') }}" class="mb-4 flex flex-wrap items-center gap-3" @submit="loading = true">
                 <label for="status" class="text-sm text-gray-700 font-medium">Filter Status:</label>
                 <select name="status" id="status" class="rounded-md border-gray-300 shadow-sm text-sm">
                     <option value="">All</option>
                     <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
                     <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Approved</option>
                 </select>
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Filter</button>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 shadow-sm">Filter</button>
             </form>
 
-            <!-- Spinner Centered -->
-            <div x-show="loading" class="fixed inset-0 flex items-center justify-center bg-white bg-opacity-50 z-50">
-                <svg class="animate-spin h-16 w-16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <!-- Spinner -->
+            <div x-show="loading" class="fixed inset-0 flex items-center justify-center bg-white bg-opacity-50 backdrop-blur-sm z-50">
+                <svg class="animate-spin h-12 w-12" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="50" cy="50" r="35" stroke-width="10" fill="none" stroke="url(#rainbow)" stroke-dasharray="180" stroke-linecap="round"></circle>
                     <defs>
                         <linearGradient id="rainbow" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -44,10 +43,10 @@
                 </svg>
             </div>
 
-            <!-- Requests Table -->
-            <div x-show="!loading" class="overflow-x-auto">
-                <table class="w-full table-auto mt-4 text-sm">
-                    <thead class="bg-gray-200 text-left">
+            <!-- Table -->
+            <div x-show="!loading" class="bg-white shadow-md rounded-lg overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-gray-100 text-gray-700 uppercase text-xs tracking-wider">
                         <tr>
                             <th class="px-4 py-2">Staff</th>
                             <th class="px-4 py-2">Request Type</th>
@@ -60,8 +59,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($requests as $request)
-                            <tr class="border-b">
+                        @foreach ($requests as $index => $request)
+                            <tr class="{{ $index % 2 === 0 ? 'bg-white' : 'bg-gray-50' }} border-b hover:bg-blue-50 transition-colors duration-150">
                                 <td class="px-4 py-2">{{ $request->user->name }}</td>
                                 <td class="px-4 py-2 capitalize">{{ $request->type }}</td>
                                 <td class="px-4 py-2">
@@ -93,7 +92,7 @@
                                             'completed' => 'bg-blue-100 text-blue-800',
                                         ];
                                     @endphp
-                                    <span class="px-3 py-1 rounded-full text-xs font-medium {{ $badgeClasses[$request->status] ?? 'bg-gray-100 text-gray-700' }}">
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold shadow-sm {{ $badgeClasses[$request->status] ?? 'bg-gray-100 text-gray-700' }}">
                                         {{ ucfirst($request->status) }}
                                     </span>
                                 </td>
@@ -102,18 +101,18 @@
                                         <div class="flex items-center justify-center gap-2">
                                             <form action="{{ route('admin.requests.approve', $request->id) }}" method="POST">
                                                 @csrf @method('PATCH')
-                                                <button class="text-green-600 hover:text-green-800 text-sm font-semibold">Approve</button>
+                                                <button class="bg-green-500 text-white px-3 py-1 rounded text-xs hover:bg-green-600">Approve</button>
                                             </form>
                                             <form action="{{ route('admin.requests.reject', $request->id) }}" method="POST">
                                                 @csrf @method('PATCH')
-                                                <button class="text-red-600 hover:text-red-800 text-sm font-semibold">Reject</button>
+                                                <button class="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600">Reject</button>
                                             </form>
                                         </div>
                                     @elseif ($request->status === 'approved')
                                         @if ($request->type === 'new' || ($request->type === 'replacement' && strtolower($request->replacement_part) === 'laptop'))
-                                            <a href="{{ route('admin.assign-form', $request->id) }}" class="text-blue-600 hover:underline text-sm">Assign</a>
+                                            <a href="{{ route('admin.assign-form', $request->id) }}" class="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600">Assign</a>
                                         @else
-                                            <a href="{{ route('admin.requests.assign-part-upgrade', $request->id) }}" class="text-blue-600 hover:underline text-sm">Assign Part/Upgrade</a>
+                                            <a href="{{ route('admin.requests.assign-part-upgrade', $request->id) }}" class="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600">Assign Part/Upgrade</a>
                                         @endif
                                     @elseif ($request->status === 'completed')
                                         <span class="text-green-700 italic">Completed</span>
