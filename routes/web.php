@@ -11,10 +11,6 @@ use App\Http\Controllers\{
     HandoverHistoryController
 };
 
-Route::get('/git-test', function () {
-    return view('git-test');
-});
-
 /*
 |--------------------------------------------------------------------------
 | 🌐 GENERAL ROUTES
@@ -25,9 +21,9 @@ Route::get('/', function () {
     return view('welcome'); // Or change to 'auth.login' if using Laravel Breeze
 });
 
-Route::get('/dashboard', function () {
+/*Route::get('/dashboard', function () {
     return view('dashboard'); // Keep default Breeze dashboard
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');*/
 
 Route::get('/redirect-by-role', function () {
     return Auth::user()->role === 'admin'
