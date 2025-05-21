@@ -17,20 +17,9 @@
             </div>
         </div>
 
-<<<<<<< HEAD
-    {{-- 🖥️ Welcome Card --}}
-    <div class="text-center px-6 py-12 bg-blue-100 shadow-md rounded-lg max-w-xl w-full">
-        
-        {{-- 🔖 Title & Tagline --}}
-        <h1 class="text-3xl font-bold mb-4">💻 Laptop Handover System</h1>
-        <p class="mb-6 text-lg">
-            Welcome to Celcom Timur Sabah Asset Management Portal. Securely manage and track company-issued devices.
-        </p>
-=======
         <!-- Title -->
         <h2 class="text-3xl font-bold text-gray-800 mb-2">Laptop Handover System</h2>
         <p class="text-gray-600 mb-8 text-base">Securely manage and track company-issued devices.</p>
->>>>>>> 0538e8aa6771ca6db46688ea158d5fdf8440334e
 
         <!-- Auth Buttons -->
         @if (Route::has('login'))
@@ -43,11 +32,7 @@
                     @endphp
 
                     <a href="{{ $redirectUrl }}"
-<<<<<<< HEAD
-                       class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
-=======
                        class="bg-blue-600 hover:bg-blue-700 text-white text-center py-3 rounded-md font-medium">
->>>>>>> 0538e8aa6771ca6db46688ea158d5fdf8440334e
                         Go to Dashboard
                     </a>
                 @else

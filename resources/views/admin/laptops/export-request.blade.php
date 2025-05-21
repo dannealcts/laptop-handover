@@ -106,7 +106,7 @@
 
                     @if(request('export_mode') === 'all_filtered')
                         <button formaction="{{ route('admin.export.all') }}" formmethod="POST"
-                            class="bg-blue-600 hover:bg-indigo-700 text-white font-medium px-5 py-2 rounded shadow-sm">
+                            class="bg-purple-700 hover:bg-purple-800 text-white font-medium px-5 py-2 rounded shadow-sm">
                             Export All (Grouped)
                         </button>
                     @endif
@@ -129,133 +129,67 @@
                     </defs>
                 </svg>
             </div>
-            @push('styles')
-            <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
-<<<<<<< HEAD
-            <style>
-            /* ============================
-            Select2 Styling to Match Tailwind Inputs
-            ============================ */
-=======
             @push('styles')
             <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
             <style>
->>>>>>> 0538e8aa6771ca6db46688ea158d5fdf8440334e
-            .select2-container--default .select2-selection--multiple {
-                display: flex;
-                flex-wrap: wrap;
-                align-items: center;
-                min-height: 2.5rem;
-<<<<<<< HEAD
-                padding: 0.5rem 0.75rem; /* px-3 py-2 */
-                font-size: 0.875rem;     /* text-sm */
-                font-weight: 400;
-                line-height: 1.25rem;
-                border: 1px solid #d1d5db; /* border-gray-300 */
-                border-radius: 0.375rem;   /* rounded-md */
-                background-color: #fff;
-                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* shadow-sm */
-                transition: border-color 0.2s, box-shadow 0.2s;
-            }
-
-            /* Active/focus state */
-            .select2-container--default .select2-selection--multiple:hover,
-            .select2-container--default .select2-selection--multiple:focus-within {
-                border-color: #2563eb; /* blue-600 */
-                box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
-            }
-
-            /* Tag pills */
-            .select2-container--default .select2-selection__choice {
-                background-color: #e5e7eb; /* gray-200 */
-                border: none;
-                color: #1f2937;            /* gray-800 */
-                font-size: 0.875rem;
-                padding: 4px 10px;
-                border-radius: 0.375rem;
-                font-weight: 500;
-                margin: 3px 4px 3px 0;
-            }
-
-            /* Search input inside */
-            .select2-container--default .select2-selection--multiple .select2-search__field {
-                font-size: 0.875rem;
-                font-weight: 400;
-                padding: 0;
-                margin: 0;
-                min-width: 120px;
-                border: none !important;
-                outline: none !important;
-                background-color: transparent;
-                line-height: 1.25rem;
-                flex-grow: 1;
-            }
-
-            /* Ensure full width & visibility */
-            .select2-container {
-                width: 100% !important;
-                z-index: 9999 !important;
-            }
-            </style>
-            @endpush
-
-            @push('scripts')
-            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- 👈 jQuery must come first -->
-=======
-                padding: 0.5rem 0.75rem;
-                font-size: 0.875rem;
-                border: 1px solid #d1d5db;
-                border-radius: 0.375rem;
-                background-color: #fff;
-                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-                transition: border-color 0.2s, box-shadow 0.2s;
-            }
-            .select2-container--default .select2-selection--multiple:hover,
-            .select2-container--default .select2-selection--multiple:focus-within {
-                border-color: #2563eb;
-                box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
-            }
-            .select2-selection__choice {
-                max-width: 100%;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                display: inline-block;
-                vertical-align: middle;
-            }
-            .select2-container--default .select2-selection__choice {
-                background-color: #e5e7eb;
-                border: none;
-                color: #1f2937;
-                font-size: 0.875rem;
-                padding: 4px 10px;
-                border-radius: 0.375rem;
-                font-weight: 500;
-                margin: 3px 4px 3px 0;
-            }
-            .select2-container--default .select2-selection--multiple .select2-search__field {
-                font-size: 0.875rem;
-                font-weight: 400;
-                padding: 0;
-                margin: 0;
-                min-width: 120px;
-                border: none !important;
-                outline: none !important;
-                background-color: transparent;
-                line-height: 1.25rem;
-                flex-grow: 1;
-            }
-            .select2-container {
-                width: 100% !important;
-                z-index: 9999 !important;
-            }
+                .select2-container--default .select2-selection--multiple {
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: center;
+                    min-height: 2.5rem;
+                    padding: 0.5rem 0.75rem;
+                    font-size: 0.875rem;
+                    border: 1px solid #d1d5db;
+                    border-radius: 0.375rem;
+                    background-color: #fff;
+                    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+                    transition: border-color 0.2s, box-shadow 0.2s;
+                }
+                .select2-container--default .select2-selection--multiple:hover,
+                .select2-container--default .select2-selection--multiple:focus-within {
+                    border-color: #2563eb;
+                    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+                }
+                .select2-selection__choice {
+                    max-width: 100%;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    display: inline-block;
+                    vertical-align: middle;
+                }
+                .select2-container--default .select2-selection__choice {
+                    background-color: #e5e7eb;
+                    border: none;
+                    color: #1f2937;
+                    font-size: 0.875rem;
+                    padding: 4px 10px;
+                    border-radius: 0.375rem;
+                    font-weight: 500;
+                    margin: 3px 4px 3px 0;
+                }
+                .select2-container--default .select2-selection--multiple .select2-search__field {
+                    font-size: 0.875rem;
+                    font-weight: 400;
+                    padding: 0;
+                    margin: 0;
+                    min-width: 120px;
+                    border: none !important;
+                    outline: none !important;
+                    background-color: transparent;
+                    line-height: 1.25rem;
+                    flex-grow: 1;
+                }
+                .select2-container {
+                    width: 100% !important;
+                    z-index: 9999 !important;
+                }
             </style>
             @endpush
 
             @push('scripts')
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
->>>>>>> 0538e8aa6771ca6db46688ea158d5fdf8440334e
             <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
             <script>
                 document.addEventListener('DOMContentLoaded', function () {
