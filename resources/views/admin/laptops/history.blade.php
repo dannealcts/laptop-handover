@@ -1,12 +1,11 @@
 <x-app-layout>
     <div class="flex min-h-screen">
-       
-    @php $currentRoute = Route::currentRouteName(); @endphp
-        
-    @include('components.admin-sidebar')
+        @php $currentRoute = Route::currentRouteName(); @endphp
+
+        @include('components.admin-sidebar')
 
         <!-- Main Content -->
-        <main class="flex-1 p-6">
+        <main class="flex-1 p-6 bg-gray-50 mx-8 my-6 rounded-lg">
             <h2 class="text-2xl font-bold mb-6 text-gray-800">Histories</h2>
 
             <!-- Completed Requests -->
@@ -14,9 +13,9 @@
                 <h3 class="text-lg font-semibold text-green-600 flex items-center mb-3">
                     Completed Requests
                 </h3>
-                <div class="bg-white shadow rounded p-4 overflow-x-auto">
+                <div class="bg-white shadow-md rounded-lg p-4 overflow-x-auto">
                     <table class="w-full text-sm table-auto">
-                        <thead class="bg-gray-100 text-gray-700">
+                        <thead class="bg-gray-100 text-gray-700 uppercase text-xs tracking-wider">
                             <tr>
                                 <th class="px-4 py-2 text-left">Staff Name</th>
                                 <th class="px-4 py-2 text-left">Request Type</th>
@@ -25,9 +24,9 @@
                                 <th class="px-4 py-2 text-left">Request Completed</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            @foreach ($completedRequests as $request)
-                                <tr>
+                        <tbody>
+                            @foreach ($completedRequests as $index => $request)
+                                <tr class="{{ $index % 2 === 0 ? 'bg-white' : 'bg-gray-50' }} border-b hover:bg-blue-50 transition-colors duration-150">
                                     <td class="px-4 py-2 font-semibold text-gray-800">{{ $request->user->name }}</td>
                                     <td class="px-4 py-2 capitalize">{{ $request->type }}</td>
                                     <td class="px-4 py-2">
@@ -36,8 +35,6 @@
                                         @else
                                             {{ $request->laptop->brand ?? '-' }} {{ $request->laptop->model ?? '-' }}
                                         @endif
-
-                                        {{-- Accessories --}}
                                         @if($request->accessories->isNotEmpty())
                                             <ul class="text-xs text-gray-600 mt-1 list-disc list-inside">
                                                 @foreach ($request->accessories as $accessory)
@@ -64,9 +61,9 @@
                 <h3 class="text-lg font-semibold text-blue-600 flex items-center mb-3">
                     Return Request History
                 </h3>
-                <div class="bg-white shadow rounded p-4 overflow-x-auto">
+                <div class="bg-white shadow-md rounded-lg p-4 overflow-x-auto">
                     <table class="w-full text-sm table-auto">
-                        <thead class="bg-gray-100 text-gray-700">
+                        <thead class="bg-gray-100 text-gray-700 uppercase text-xs tracking-wider">
                             <tr>
                                 <th class="px-4 py-2 text-left">Staff Name</th>
                                 <th class="px-4 py-2 text-left">Returned Laptop</th>
@@ -76,21 +73,21 @@
                                 <th class="px-4 py-2 text-left">Form</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            @foreach ($returnHistories as $return)
-                                <tr>
+                        <tbody>
+                            @foreach ($returnHistories as $index => $return)
+                                <tr class="{{ $index % 2 === 0 ? 'bg-white' : 'bg-gray-50' }} border-b hover:bg-blue-50 transition-colors duration-150">
                                     <td class="px-4 py-2 font-semibold text-gray-800">{{ $return->user->name }}</td>
                                     <td class="px-4 py-2">{{ $return->laptop->model ?? '-' }}</td>
                                     <td class="px-4 py-2">{{ $return->reason }}</td>
                                     <td class="px-4 py-2">
                                         @php
                                             $statusColors = [
-                                                'pending'   => 'bg-yellow-200 text-yellow-900',
-                                                'received'  => 'bg-green-200 text-green-800',
-                                                'completed' => 'bg-blue-200 text-blue-800',
+                                                'pending'   => 'bg-yellow-100 text-yellow-800',
+                                                'received'  => 'bg-green-100 text-green-800',
+                                                'completed' => 'bg-blue-100 text-blue-800',
                                             ];
                                         @endphp
-                                        <span class="px-3 py-1 rounded-full text-xs font-semibold {{ $statusColors[$return->status] ?? 'bg-gray-100 text-gray-600' }}">
+                                        <span class="px-3 py-1 rounded-full text-xs font-semibold shadow-sm {{ $statusColors[$return->status] ?? 'bg-gray-100 text-gray-600' }}">
                                             {{ ucfirst($return->status) }}
                                         </span>
                                     </td>
