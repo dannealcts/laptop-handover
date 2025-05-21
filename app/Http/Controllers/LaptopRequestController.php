@@ -80,7 +80,7 @@ class LaptopRequestController extends Controller
                     ->where('status', 'completed');
             })->get();
 
-        return view('staff.request-laptop', compact('assignedLaptops'));
+        return view('staff.make-request', compact('assignedLaptops'));
     }
 
     /** Store Staff Laptop Request */
