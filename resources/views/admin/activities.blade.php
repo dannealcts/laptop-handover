@@ -12,7 +12,7 @@
             <!-- Filters Form -->
             <form 
                 method="GET" 
-                action="{{ route('admin.laptops.activities') }}" 
+                action="{{ route('admin.activities') }}" 
                 class="flex flex-wrap items-end gap-4 bg-white p-4 rounded-lg shadow"
                 @submit="loading = true"
             >
@@ -38,7 +38,7 @@
                     <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition">
                         Filter
                     </button>
-                    <a href="{{ route('admin.laptops.activities') }}" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-400 transition">
+                    <a href="{{ route('admin.activities') }}" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-400 transition">
                         Reset
                     </a>
                 </div>

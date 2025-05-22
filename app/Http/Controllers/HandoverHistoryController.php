@@ -86,6 +86,6 @@ class HandoverHistoryController extends Controller
             ];
         });
 
-        return view('staff.my-requests', ['histories' => $histories]);
+        return view('staff.request-history', ['histories' => $histories]);
     }
 }

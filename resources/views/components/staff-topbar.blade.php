@@ -20,12 +20,12 @@
                     Make Request
                 </a>
 
-                <a href="{{ route('staff.my-requests') }}"
+                <a href="{{ route('staff.request-history') }}"
                    class="px-4 py-2 rounded-md transition
-                          {{ request()->routeIs('staff.my-requests') 
+                          {{ request()->routeIs('staff.request-history') 
                               ? 'bg-green-100 text-green-700 font-semibold shadow-sm' 
                               : 'hover:bg-gray-100' }}">
-                    My Requests
+                    Request History
                 </a>
 
                 <a href="{{ route('staff.return-laptop.create') }}"

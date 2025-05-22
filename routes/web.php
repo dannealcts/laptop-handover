@@ -59,13 +59,15 @@ require __DIR__ . '/auth.php';
 
 Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(function () {
 
+    
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
     // Laptop Inventory
     Route::resource('laptops', LaptopInvController::class)->names('laptops');
 
+
     // Laptop Requests
-    Route::get('/staff-requests', [LaptopRequestController::class, 'adminIndex'])->name('view-staff-requests');
+    Route::get('/view-requests', [LaptopRequestController::class, 'adminIndex'])->name('view-requests');
     Route::patch('/laptop-requests/{request}/approve', [LaptopRequestController::class, 'approve'])->name('requests.approve');
     Route::patch('/laptop-requests/{request}/reject', [LaptopRequestController::class, 'reject'])->name('requests.reject');
     Route::get('/laptop-requests/{id}/assign', [LaptopRequestController::class, 'assignForm'])->name('assign-form');
@@ -101,7 +103,7 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
     })->name('export-request');
 
     // Activities
-    Route::get('/activities', [AdminController::class, 'viewActivities'])->name('laptops.activities');
+    Route::get('/activities', [AdminController::class, 'viewActivities'])->name('activities');
 });
 
 /*
@@ -121,7 +123,7 @@ Route::prefix('staff')->middleware(['auth', 'verified'])->name('staff.')->group(
     Route::post('/make-request', [LaptopRequestController::class, 'store'])->name('make-request.store');
 
     // My Requests
-    Route::get('/my-requests', [HandoverHistoryController::class, 'myHistory'])->name('my-requests');
+    Route::get('/request-history', [HandoverHistoryController::class, 'myHistory'])->name('request-history');
 
     // Return Laptop
     Route::get('/return-laptop', [ReturnRequestController::class, 'create'])->name('return-laptop.create');

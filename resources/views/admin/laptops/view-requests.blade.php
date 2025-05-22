@@ -17,7 +17,7 @@
             @endif
 
             <!-- Filter -->
-            <form method="GET" action="{{ route('admin.view-staff-requests') }}" class="mb-4 flex flex-wrap items-center gap-3" @submit="loading = true">
+            <form method="GET" action="{{ route('admin.view-requests') }}" class="mb-4 flex flex-wrap items-center gap-3" @submit="loading = true">
                 <label for="status" class="text-sm text-gray-700 font-medium">Filter Status:</label>
                 <select name="status" id="status" class="rounded-md border-gray-300 shadow-sm text-sm">
                     <option value="">All</option>
