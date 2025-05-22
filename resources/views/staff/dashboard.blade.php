@@ -20,16 +20,16 @@
                        class="bg-green-600 hover:bg-green-700 text-white font-semibold py-6 px-4 rounded-xl text-center shadow-md hover:shadow-xl transition transform hover:-translate-y-1">
                         <div class="flex flex-col items-center">
                             <i data-lucide="plus" class="w-6 h-6 mb-2"></i>
-                            Make a Request
+                            Make Request
                         </div>
                     </a>
 
                     <!-- View My Requests -->
-                    <a href="{{ route('staff.my-requests') }}"
+                    <a href="{{ route('staff.request-history') }}"
                        class="bg-green-600 hover:bg-green-700 text-white font-semibold py-6 px-4 rounded-xl text-center shadow-md hover:shadow-xl transition transform hover:-translate-y-1">
                         <div class="flex flex-col items-center">
                             <i data-lucide="list-checks" class="w-6 h-6 mb-2"></i>
-                            View My Requests
+                            Request History
                         </div>
                     </a>
 
@@ -38,7 +38,7 @@
                        class="bg-green-600 hover:bg-green-700 text-white font-semibold py-6 px-4 rounded-xl text-center shadow-md hover:shadow-xl transition transform hover:-translate-y-1">
                         <div class="flex flex-col items-center">
                             <i data-lucide="undo" class="w-6 h-6 mb-2"></i>
-                            Return a Laptop
+                            Return Request
                         </div>
                     </a>
                 </div>

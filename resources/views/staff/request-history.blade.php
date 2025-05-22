@@ -7,7 +7,7 @@
 
                 <!-- Page Title -->
                 <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2 mt-4">
-                    My Laptop Requests
+                    Request History
                 </h2>
 
                 <!-- Success Message -->

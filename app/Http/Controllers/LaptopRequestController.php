@@ -145,7 +145,7 @@ class LaptopRequestController extends Controller
 
         $requests = $query->latest()->paginate(10);
 
-        return view('admin.laptops.view-staff-requests', compact('requests'));
+        return view('admin.laptops.view-requests', compact('requests'));
     }
 
     /** Approve Staff Request */
@@ -224,7 +224,7 @@ class LaptopRequestController extends Controller
 
         app(HandoverHistoryController::class)->storeFromAssignment($laptopRequest->id);
 
-        return redirect()->route('admin.view-staff-requests')->with('success', 'Laptop and accessories assigned successfully!');
+        return redirect()->route('admin.view-requests')->with('success', 'Laptop and accessories assigned successfully!');
     }
 
     /** Show Export Form */
@@ -510,7 +510,7 @@ class LaptopRequestController extends Controller
             return view('admin.laptops.assign-part-upgrade', compact('request'));
         }
 
-        return redirect()->route('admin.view-staff-requests')->with('error', 'This request does not require a part/upgrade assignment.');
+        return redirect()->route('admin.view-requests')->with('error', 'This request does not require a part/upgrade assignment.');
     }
 
     /** Store Assigned Part/Upgrade */
@@ -538,7 +538,7 @@ class LaptopRequestController extends Controller
             'message' => "Assigned part/upgrade '{$request->assigned_part}' (Qty: {$request->quantity}) to {$laptopRequest->user->name}{$laptopInfo} for request #{$laptopRequest->id}.",
         ]);
 
-        return redirect()->route('admin.view-staff-requests')->with('success', 'Part/Upgrade assigned and marked as completed.');
+        return redirect()->route('admin.view-requests')->with('success', 'Part/Upgrade assigned and marked as completed.');
     }
 
     /** Get Export Description Text */

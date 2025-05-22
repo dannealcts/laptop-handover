@@ -73,7 +73,7 @@ class LaptopInvController extends Controller
     //Display the details of a specific laptop
     public function show(Laptop $laptop)
     {
-        return view('admin.laptops.show', compact('laptop'));
+        return view('admin.show', compact('laptop'));
     }
 
     //Show form to edit an existing laptop

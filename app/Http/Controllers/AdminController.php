@@ -84,7 +84,7 @@ class AdminController extends Controller
 
         $activities = $query->orderBy('created_at', 'desc')->paginate(20);
 
-        return view('admin.laptops.activities', compact('activities'));
+        return view('admin.activities', compact('activities'));
         
     }
 

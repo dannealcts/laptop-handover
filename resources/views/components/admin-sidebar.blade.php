@@ -16,8 +16,8 @@
                 <span>Laptop Inventory</span>
             </a>
 
-            <a href="{{ route('admin.view-staff-requests') }}"
-               class="flex items-center gap-2 px-4 py-2 rounded {{ $currentRoute === 'admin.view-staff-requests' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-blue-100' }}">
+            <a href="{{ route('admin.view-requests') }}"
+               class="flex items-center gap-2 px-4 py-2 rounded {{ $currentRoute === 'admin.view-requests' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-blue-100' }}">
                 <i data-lucide="file-text" class="w-5 h-5"></i>
                 <span>Requests</span>
             </a>
