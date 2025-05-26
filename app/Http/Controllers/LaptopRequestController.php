@@ -236,17 +236,17 @@ class LaptopRequestController extends Controller
         if ($request->filled(['start_date', 'end_date'])) {
             $start = Carbon::parse($request->start_date)->startOfDay();
             $end = Carbon::parse($request->end_date)->endOfDay();
-        
+
             $query = LaptopRequest::with(['user', 'laptop', 'accessories'])
                 ->whereBetween('created_at', [$start, $end])
                 ->whereIn('status', ['approved', 'completed']);
-        
-            if ($request->filled('staff_ids')) {
+
+            if ($request->filled('staff_ids') && !in_array('all', $request->staff_ids)) {
                 $query->whereIn('user_id', $request->staff_ids);
             }
-        
+
             $requests = $query->get();
-        }        
+        }
 
         return view('admin.laptops.export-request', [
             'staffList' => $staffList,
@@ -272,7 +272,7 @@ class LaptopRequestController extends Controller
         return view('admin.laptops.export-request', compact('staff', 'requests'));
     }
 
-    // Select Staff To Export
+     /** Export Selected Requests */
     public function exportSelected(Request $request)
     {
         $request->validate([
@@ -287,6 +287,8 @@ class LaptopRequestController extends Controller
         if ($requests->isEmpty()) {
             return back()->with('error', 'No selected requests found.');
         }
+
+        return $this->generateExportFile($requests, $request->input('remark'), 'SELECTED');
 
         $spreadsheet = IOFactory::load(storage_path('app/templates/PURCHASE REQUISITION FORM.xlsx'));
         $sheet = $spreadsheet->getActiveSheet();
@@ -384,7 +386,7 @@ class LaptopRequestController extends Controller
             $sheet->setCellValue("K{$row}", 'Unit');
         }
 
-        $sheet->setCellValue('D30', $remark ?: '-');
+        //$sheet->setCellValue('D30', $remark ?: '-');
 
         $filename = 'FD-F04-' . now()->format('Ymd-His') . '.xlsx';
         $filepath = storage_path("app/public/exports/{$filename}");
@@ -404,6 +406,7 @@ class LaptopRequestController extends Controller
         return '-';
     }
 
+    /** Export All Filtered Requests */
     public function exportAllFiltered(Request $request)
     {
         $request->validate([
@@ -428,78 +431,134 @@ class LaptopRequestController extends Controller
             return back()->with('error', 'No requests found for the selected range.');
         }
 
-        // Group by specs
-        $grouped = $requests->groupBy(function ($req) {
-            return implode('|', [
-                $req->type,
-                $req->laptop?->brand,
-                $req->laptop?->model,
-                $req->assigned_part,
-                $req->upgrade_type,
-                $req->replacement_part,
-            ]);
-        });
+        return $this->generateExportFile($requests, $request->input('remark'), 'GROUPED');
+    }
 
-        // Load template
-        $spreadsheet = IOFactory::load(storage_path('app/templates/PURCHASE REQUISITION FORM.xlsx'));
-        $sheet = $spreadsheet->getActiveSheet();
+   /** Generate Export File (Shared Logic) */
+protected function generateExportFile($requests, $remark = '-', $label = 'EXPORT')
+{
+    $spreadsheet = IOFactory::load(storage_path('app/templates/PURCHASE REQUISITION FORM.xlsx'));
+    $sheet = $spreadsheet->getActiveSheet();
 
-        $row = 18;
-        $itemIndex = 1;
+    $grouped = $requests->groupBy(function ($req) {
+        return implode('|', [
+            $req->type,
+            $req->laptop?->brand,
+            $req->laptop?->model,
+            $req->assigned_part,
+            $req->upgrade_type,
+            $req->replacement_part,
+        ]);
+    });
 
-        $remark = $request->input('remark') ?? '-';
+    $startRow = 18;
+    $row = $startRow;
+    $itemIndex = 1;
 
+    // Each group takes 2 rows, calculate total needed rows
+    $requiredRows = count($grouped) * 2;
 
-        foreach ($grouped as $group) {
-            $first = $group->first();
+    // Ensure enough space (row 30 is where remarks begin)
+    $defaultRemarkRow = 30;
+    $availableRows = $defaultRemarkRow - $startRow;
+    if ($requiredRows > $availableRows) {
+        $sheet->insertNewRowBefore($defaultRemarkRow, $requiredRows - $availableRows);
+    }
 
-            $staffNames = $group->pluck('user.name')->join(', ');
+    foreach ($grouped as $group) {
+        $first = $group->first();
+        $staffNames = $group->pluck('user.name')->join(', ');
 
-            $accessoryText = collect();
-            foreach ($group as $req) {
-                if ($req->accessories && $req->accessories->isNotEmpty()) {
-                    $accessoryText = $accessoryText->merge($req->accessories->map(function ($a) {
-                        return $a->accessory_name . ' (x' . $a->quantity . ')';
-                    }));
-                }
+        $accessoryText = collect();
+        foreach ($group as $req) {
+            if ($req->accessories && $req->accessories->isNotEmpty()) {
+                $accessoryText = $accessoryText->merge($req->accessories->map(function ($a) {
+                    return $a->accessory_name . ' (x' . $a->quantity . ')';
+                }));
             }
-            $accessoryStr = $accessoryText->unique()->implode(', ');
+        }
+        $accessoryStr = $accessoryText->unique()->implode(', ');
 
-            $item = $this->getExportItemDescription($first);
-            $fullItem = $accessoryStr ? "$item, $accessoryStr" : $item;
+        $item = $this->getExportItemDescription($first);
+        $mainLine = trim($item . ($accessoryStr ? ", $accessoryStr" : ''));
+        $descriptionWithNames = "$mainLine – $staffNames";
 
-            // Format item row
-            $staffNames = $group->pluck('user.name')->join(', ');
-            $descriptionWithNames = "$item – $staffNames";
+        // Main description row
+        $sheet->setCellValue("B{$row}", $itemIndex);
+        $sheet->mergeCells("C{$row}:I{$row}");
+        $sheet->setCellValue("C{$row}", $descriptionWithNames);
+        $sheet->getStyle("C{$row}:I{$row}")->getAlignment()->setWrapText(true);
+        $sheet->getStyle("C{$row}:I{$row}")->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP);
+        $sheet->getStyle("C{$row}:I{$row}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+        $sheet->setCellValue("J{$row}", $group->count());
+        $sheet->setCellValue("K{$row}", 'Unit');
 
-            // Add item line
-            $sheet->setCellValue("B{$row}", $itemIndex);
-            $sheet->setCellValue("C{$row}", $descriptionWithNames);
-            $sheet->setCellValue("J{$row}", $group->count());
-            $sheet->setCellValue("K{$row}", 'Unit');
+        // Spec row
+        $row++;
+        $sheet->mergeCells("C{$row}:I{$row}");
+        $sheet->setCellValue("C{$row}", $this->getLaptopSpecsText($first));
+        $sheet->getStyle("C{$row}:I{$row}")->getAlignment()->setWrapText(true);
+        $sheet->getStyle("C{$row}:I{$row}")->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP);
+        $sheet->getStyle("C{$row}:I{$row}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
 
-            // Add second line: specification
-            $sheet->setCellValue("C{$row}", $this->getLaptopSpecsText($first));
-            $row++;
-            $itemIndex++;
-            
-            //$remark .= "\nItem $itemIndex – Requested by: $staffNames";
+        // Prepare for next
+        $row++;
+        $itemIndex++;
+    }
+
+    // Dynamically detect the row with "REMARKS:" in column B
+$remarkLabelRow = null;
+foreach (range(30, 60) as $r) {
+    $cellValue = strtoupper(trim((string) $sheet->getCell("B{$r}")->getValue()));
+    if ($cellValue === 'REMARKS:' || str_contains($cellValue, 'REMARKS')) {
+        $remarkLabelRow = $r;
+        break;
+    }
+}
+
+if ($remarkLabelRow) {
+    $mergeRange = "D{$remarkLabelRow}:K" . ($remarkLabelRow + 1);
+
+    // DO NOT try to re-merge if already merged (it causes file corruption)
+    $isAlreadyMerged = false;
+    foreach ($sheet->getMergeCells() as $range => $dummy) {
+        if (strtoupper($range) === strtoupper($mergeRange)) {
+            $isAlreadyMerged = true;
+            break;
+        }
+    }
+
+    // Only clear contents inside D-K if not already merged (to avoid Excel issues)
+    if (!$isAlreadyMerged) {
+        foreach (range($remarkLabelRow, $remarkLabelRow + 1) as $rowNum) {
+            foreach (range('D', 'K') as $col) {
+                $sheet->setCellValue("{$col}{$rowNum}", null);
+            }
         }
 
-        // Push everything below down — insert space above row 30
-        $sheet->insertNewRowBefore(30, $row - 30 + 3); // 3 buffer rows
-
-        // Then drop the remark to new row
-        $sheet->setCellValue('D' . ($row + 2), $remark);
-
-        $filename = 'FD-F04-GROUPED-' . now()->format('Ymd-His') . '.xlsx';
-        $filepath = storage_path("app/public/exports/{$filename}");
-
-        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-        $writer->save($filepath);
-
-        return response()->download($filepath)->deleteFileAfterSend(true);
+        $sheet->mergeCells($mergeRange);
     }
+
+    // Write the remark in the top-left cell of the merged block
+    $cleanedRemark = preg_replace('/[[:cntrl:]]/', '', $remark);
+    $sheet->setCellValue("D{$remarkLabelRow}", $cleanedRemark ?: '-');
+
+    // Format alignment
+    $style = $sheet->getStyle("D{$remarkLabelRow}");
+    $style->getAlignment()->setWrapText(true);
+    $style->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP);
+    $style->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+}
+
+    $filename = "FD-F04-{$label}-" . now()->format('Ymd-His') . '.xlsx';
+    $filepath = storage_path("app/public/exports/{$filename}");
+
+    $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+    $writer->save($filepath);
+
+    return response()->download($filepath)->deleteFileAfterSend(true);
+}
+
 
     /** Assign Part/Upgrade (Non-Laptop) */
     public function assignPartUpgradeForm($id)

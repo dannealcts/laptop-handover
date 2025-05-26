@@ -34,10 +34,11 @@
                 <span>Histories</span>
             </a>
 
-            <a href="{{ route('admin.export-request') }}"
-               class="flex items-center gap-2 px-4 py-2 rounded {{ $currentRoute === 'admin.export-request' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-blue-100' }}">
-                <i data-lucide="download" class="w-5 h-5"></i>
-                <span>Export Request</span>
+            <a href="{{ route('admin.export.form') }}"
+                class="flex items-center gap-2 px-4 py-2 rounded {{ $currentRoute === 'admin.export.form' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-blue-100' }}">
+                    <i data-lucide="download" class="w-5 h-5"></i>
+                    <span>Export Request</span>
+                </a>
             </a>
         </nav>
     </div>
