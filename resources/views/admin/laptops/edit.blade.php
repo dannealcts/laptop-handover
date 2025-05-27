@@ -8,6 +8,13 @@
                 @csrf
                 @method('PUT')
 
+                {{-- Purchased Date --}}
+                <div class="form-group">
+                    <label for="purchase_date">Purchase Date</label>
+                    <input type="date" name="purchase_date" id="purchase_date" class="form-control" 
+                        value="{{ old('purchase_date', isset($laptop) ? $laptop->purchase_date : '') }}">
+                </div>
+
                 {{-- Asset Tag --}}
                 <div class="mb-4">
                     <label for="asset_tag" class="block text-sm font-medium text-gray-700">Asset Tag</label>

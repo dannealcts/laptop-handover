@@ -51,6 +51,7 @@ class LaptopInvController extends Controller
             'serial_number' => 'required|unique:laptops',
             'specs'         => 'nullable|string|max:1000',
             'status'        => 'required|in:available,assigned,maintenance',
+            'purchase_date' => 'nullable|date',
         ]);
 
         $laptop = Laptop::create([
@@ -60,6 +61,7 @@ class LaptopInvController extends Controller
             'serial_number' => $request->serial_number,
             'specs'         => $request->specs,
             'status'        => $request->status,
+            'purchase_date' => $request->purchase_date,
         ]);
 
         Activity::create([
@@ -93,6 +95,7 @@ class LaptopInvController extends Controller
             'serial_number' => 'required|unique:laptops,serial_number,' . $laptop->id,
             'specs'         => 'nullable|string|max:1000',
             'status'        => 'required|in:available,assigned,maintenance',
+            'purchase_date' => 'nullable|date',
         ]);
 
         $laptop->update([
@@ -102,6 +105,7 @@ class LaptopInvController extends Controller
             'serial_number' => $request->serial_number,
             'specs'         => $request->specs,
             'status'        => $request->status,
+            'purchase_date' => $request->purchase_date,
         ]);
 
         Activity::create([

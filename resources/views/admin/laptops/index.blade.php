@@ -63,6 +63,8 @@
                             <th class="px-4 py-2">Serial No</th>
                             <th class="px-4 py-2">Specs</th>
                             <th class="px-4 py-2">Status</th>
+                            <th class="px-4 py-2">Purchased Date</th>
+                            <th class="px-4 py-2">Upgrade Eligible</th>
                             <th class="px-4 py-2">Actions</th>
                         </tr>
                     </thead>
@@ -85,6 +87,16 @@
                                 <span class="px-3 py-1 rounded-full text-xs font-semibold shadow-sm {{ $badgeClass }}">
                                     {{ ucfirst($laptop->status) }}
                                 </span>
+                            </td>
+                            <td class="px-4 py-2">
+                                {{ $laptop->purchase_date ? \Carbon\Carbon::parse($laptop->purchase_date)->format('Y-m-d') : '-' }}
+                            </td>
+                            <td>
+                                @if ($laptop->isEligibleForUpgrade())
+                                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold shadow-sm">Yes</span>
+                                @else
+                                    <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-semibold shadow-sm">No</span>
+                                @endif
                             </td>
                             <td class="px-4 py-2">
                                 <div class="flex items-center gap-2">
