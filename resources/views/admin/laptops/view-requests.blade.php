@@ -84,17 +84,17 @@
                                     @if ($request->status === 'pending')
                                         <div class="flex items-center justify-center gap-2">
                                             <form action="{{ route('admin.requests.approve', $request->id) }}" method="POST">
-                                                @csrf @method('PATCH')
+                                                @csrf
                                                 <button class="bg-green-500 text-white px-3 py-1 rounded text-xs hover:bg-green-600">Approve</button>
                                             </form>
                                             <form action="{{ route('admin.requests.reject', $request->id) }}" method="POST">
-                                                @csrf @method('PATCH')
+                                                @csrf
                                                 <button class="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600">Reject</button>
                                             </form>
                                         </div>
                                     @elseif ($request->status === 'approved')
                                         @if ($request->type === 'new' || ($request->type === 'replacement' && strtolower($request->replacement_part) === 'laptop'))
-                                            <a href="{{ route('admin.assign-form', $request->id) }}" class="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600">Assign</a>
+                                            <a href="{{ route('admin.assign.form', $request->id) }}" class="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600">Assign</a>
                                         @else
                                             <a href="{{ route('admin.assign.part.form', $request->id) }}" class="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600">Assign Part/Upgrade</a>
                                         @endif

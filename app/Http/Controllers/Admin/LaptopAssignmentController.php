@@ -40,6 +40,16 @@ class LaptopAssignmentController extends Controller
 
         $laptopRequest = LaptopRequest::findOrFail($id);
 
+        // Prevent assigning the same laptop to multiple requests
+        $alreadyAssigned = LaptopRequest::where('assigned_laptop_id', $validated['laptop_id'])
+            ->whereIn('status', ['approved', 'assigned', 'handovered', 'completed'])
+            ->where('id', '!=', $laptopRequest->id)
+            ->exists();
+
+        if ($alreadyAssigned) {
+            return back()->with('error', 'This laptop is already assigned to another staff member.');
+        }
+
         $laptopRequest->update([
             'laptop_id' => $validated['laptop_id'],
             'assigned_laptop_id' => $validated['laptop_id'],
