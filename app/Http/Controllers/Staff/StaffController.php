@@ -1,13 +1,17 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Staff;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\LaptopRequest;
 use Carbon\Carbon;
 
 class StaffController extends Controller
 {
+    /**
+     * Display the staff dashboard showing assigned laptop and upgrade eligibility.
+     */
     public function dashboard()
     {
         $user = Auth::user();
@@ -16,7 +20,7 @@ class StaffController extends Controller
             ->whereNotNull('assigned_laptop_id')
             ->whereIn('status', ['approved', 'assigned', 'handovered', 'completed'])
             ->with('assignedLaptop')
-            ->orderByDesc('created_at')
+            ->latest()
             ->first();
 
         $assignedLaptop = $latestAssignedRequest?->assignedLaptop;
@@ -35,6 +39,10 @@ class StaffController extends Controller
             }
         }
 
-        return view('staff.dashboard', compact('assignedLaptop', 'eligibleLaptop', 'timeLeftReadable'));
+        return view('staff.dashboard', compact(
+            'assignedLaptop',
+            'eligibleLaptop',
+            'timeLeftReadable'
+        ));
     }
 }

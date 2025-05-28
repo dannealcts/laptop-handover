@@ -1,6 +1,6 @@
 <x-app-layout>
     <div class="flex min-h-screen">
-    
+
     @php $currentRoute = Route::currentRouteName(); @endphp
 
     @include('components.admin-sidebar')
@@ -36,7 +36,7 @@
             @endif
 
             {{-- Assignment Form --}}
-            <form method="POST" action="{{ route('admin.requests.assign-part-upgrade.submit', $request->id) }}">
+            <form method="POST" action="{{ route('admin.assign.part.store', $request->id) }}">
                 @csrf
 
                 {{-- Assigned Part/Upgrade --}}

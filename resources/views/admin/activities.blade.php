@@ -44,22 +44,6 @@
                 </div>
             </form>
 
-            <!-- Spinner -->
-            <div x-show="loading" class="flex justify-center items-center mt-8">
-                <svg class="animate-spin h-12 w-12" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="50" cy="50" r="35" stroke-width="10" fill="none" stroke="url(#rainbow)" stroke-dasharray="180" stroke-linecap="round"></circle>
-                    <defs>
-                        <linearGradient id="rainbow" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" stop-color="#ff5f6d" />
-                            <stop offset="25%" stop-color="#ffc371" />
-                            <stop offset="50%" stop-color="#47cf73" />
-                            <stop offset="75%" stop-color="#00c6ff" />
-                            <stop offset="100%" stop-color="#845ec2" />
-                        </linearGradient>
-                    </defs>
-                </svg>
-            </div>
-
             <!-- Activities Table -->
             <div x-show="!loading" class="overflow-x-auto bg-white shadow rounded-lg mt-8">
                 <table class="min-w-full text-sm text-left">

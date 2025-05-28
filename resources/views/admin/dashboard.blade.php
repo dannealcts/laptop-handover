@@ -6,19 +6,17 @@
 
         <!-- Main Dashboard Content -->
         <main class="flex-1 p-8 mx-8 my-6">
+            @if (session('success'))
+                <div class="mb-6 px-4 py-3 bg-green-100 border border-green-300 text-green-800 rounded shadow-sm">
+                    {{ session('success') }}
+                </div>
+            @endif
 
-@if (session('success'))
-    <div class="mb-6 px-4 py-3 bg-green-100 border border-green-300 text-green-800 rounded shadow-sm">
-        {{ session('success') }}
-    </div>
-@endif
-
-@if (session('error'))
-    <div class="mb-6 px-4 py-3 bg-red-100 border border-red-300 text-red-800 rounded shadow-sm">
-        {{ session('error') }}
-    </div>
-@endif
-
+            @if (session('error'))
+                <div class="mb-6 px-4 py-3 bg-red-100 border border-red-300 text-red-800 rounded shadow-sm">
+                    {{ session('error') }}
+                </div>
+            @endif
 
             <h1 class="text-2xl font-bold text-gray-800 mb-6">Dashboard Overview</h1>
 
@@ -99,25 +97,24 @@
                                             }}
                                         </td>
                                         @php
-    $latestRequest = $laptop->requests
-        ->whereIn('status', ['approved', 'assigned', 'completed'])
-        ->sortByDesc('created_at')
-        ->first();
-@endphp
+                                            $latestRequest = $laptop->requests
+                                                ->whereIn('status', ['approved', 'assigned', 'completed'])
+                                                ->sortByDesc('created_at')
+                                                ->first();
+                                        @endphp
 
-<td class="px-4 py-2 text-center">
-    @if ($latestRequest && $latestRequest->user)
-        <form method="POST" action="{{ route('admin.notify-upgrade', $latestRequest->user->id) }}">
-            @csrf
-            <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm shadow">
-                Notify
-            </button>
-        </form>
-    @else
-        <span class="text-gray-400 italic text-sm">No assigned user</span>
-    @endif
-</td>
-
+                                        <td class="px-4 py-2 text-center">
+                                            @if ($latestRequest && $latestRequest->user)
+                                                <form method="POST" action="{{ route('admin.notify-upgrade', $latestRequest->user->id) }}">
+                                                    @csrf
+                                                    <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm shadow">
+                                                        Notify
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <span class="text-gray-400 italic text-sm">No assigned user</span>
+                                            @endif
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>

@@ -1379,9 +1379,7 @@
                 "phpstan/phpstan": "^1.11",
                 "phpstan/phpstan-mockery": "^1.1"
             },
-            "suggest": {
-                "ext-pcntl": "Required for the spinner to be animated."
-            },
+
             "type": "library",
             "extra": {
                 "branch-alias": {

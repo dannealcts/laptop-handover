@@ -46,7 +46,7 @@
 
                 <!-- Request Form -->
                 <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
-                    <form action="{{ route('staff.make-request.store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('staff.requests.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
                         <!-- Request Type -->

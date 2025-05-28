@@ -2,29 +2,30 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\{
-    ProfileController,
-    LaptopInvController,
-    LaptopRequestController,
-    ReturnRequestController,
-    AdminController,
-    HandoverHistoryController,
-    StaffController
-};
 
-/*
-|--------------------------------------------------------------------------
-| 🌐 GENERAL ROUTES
-|--------------------------------------------------------------------------
-*/
+// Shared controllers
+use App\Http\Controllers\ProfileController;
+
+// 🛠️ Admin Controllers
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\LaptopController as LaptopInvController;
+use App\Http\Controllers\Admin\LaptopRequestController;
+use App\Http\Controllers\Admin\LaptopAssignmentController;
+use App\Http\Controllers\Admin\ExportController;
+use App\Http\Controllers\Admin\ReturnRequestController as AdminReturnController;
+use App\Http\Controllers\Admin\HandoverHistoryController as AdminHandoverController;
+use App\Http\Controllers\Admin\NotificationController;
+use App\Http\Controllers\Admin\HistoryController;
+
+// 👩‍💼 Staff Controllers
+use App\Http\Controllers\Staff\StaffController;
+use App\Http\Controllers\Staff\LaptopRequestController as StaffLaptopRequestController;
+use App\Http\Controllers\Staff\ReturnRequestController as StaffReturnController;
+use App\Http\Controllers\Staff\HandoverHistoryController as StaffHandoverController;
 
 Route::get('/', function () {
-    return view('welcome'); // Or change to 'auth.login' if using Laravel Breeze
+    return view('welcome');
 });
-
-/*Route::get('/dashboard', function () {
-    return view('dashboard'); // Keep default Breeze dashboard
-})->middleware(['auth', 'verified'])->name('dashboard');*/
 
 Route::get('/redirect-by-role', function () {
     return Auth::user()->role === 'admin'
@@ -34,10 +35,9 @@ Route::get('/redirect-by-role', function () {
 
 /*
 |--------------------------------------------------------------------------
-| 👤 PROFILE MANAGEMENT
+| 👤 Profile Management
 |--------------------------------------------------------------------------
 */
-
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -46,85 +46,74 @@ Route::middleware('auth')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| 🔐 AUTH ROUTES
+| 🔐 Auth Routes
 |--------------------------------------------------------------------------
 */
-
 require __DIR__ . '/auth.php';
 
-/*
+/* 
 |--------------------------------------------------------------------------
-| 🛠️ ADMIN ROUTES
+| 🛠️ Admin Routes
 |--------------------------------------------------------------------------
 */
-
 Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(function () {
-
-    Route::post('/notify-upgrade/{userId}', [AdminController::class, 'notifyUpgrade'])->name('notify-upgrade');
+    
+    // Dashboard
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::post('/notify-upgrade/{userId}', [NotificationController::class, 'sendUpgradeEmail'])->name('notify-upgrade');
 
-    // Laptop Inventory
+    // Laptop Inventory (This uses the correct resource routes)
     Route::resource('laptops', LaptopInvController::class)->names('laptops');
 
-    // Laptop Requests
-    Route::get('/view-requests', [LaptopRequestController::class, 'adminIndex'])->name('view-requests');
-    Route::patch('/laptop-requests/{request}/approve', [LaptopRequestController::class, 'approve'])->name('requests.approve');
-    Route::patch('/laptop-requests/{request}/reject', [LaptopRequestController::class, 'reject'])->name('requests.reject');
-    Route::get('/laptop-requests/{id}/assign', [LaptopRequestController::class, 'assignForm'])->name('assign-form');
-    Route::post('/laptop-requests/{id}/assign', [LaptopRequestController::class, 'assignLaptop'])->name('assign-laptop');
+    // Staff Laptop Requests (This was incorrectly named as 'laptops.index' before)
+    Route::get('/requests', [LaptopRequestController::class, 'index'])->name('requests.index');
+    Route::post('/requests/{request}/approve', [LaptopRequestController::class, 'approve'])->name('requests.approve');
+    Route::post('/requests/{request}/reject', [LaptopRequestController::class, 'reject'])->name('requests.reject');
 
-    // Part/Upgrade Assignments
-    Route::get('/requests/{id}/assign-part-upgrade', [LaptopRequestController::class, 'assignPartUpgradeForm'])->name('requests.assign-part-upgrade');
-    Route::post('/requests/{id}/assign-part-upgrade', [LaptopRequestController::class, 'storeAssignedPartUpgrade'])->name('requests.assign-part-upgrade.submit');
-    Route::patch('/requests/{id}/mark-completed', [LaptopRequestController::class, 'markAsCompleted'])->name('requests.mark-completed');
+    // Assignment
+    Route::get('/requests/{id}/assign', [LaptopAssignmentController::class, 'assignForm'])->name('assign.form');
+    Route::post('/requests/{id}/assign', [LaptopAssignmentController::class, 'assignLaptop'])->name('assign.laptop');
+
+    Route::get('/requests/{id}/assign-part', [LaptopAssignmentController::class, 'assignPartUpgradeForm'])->name('assign.part.form');
+    Route::post('/requests/{id}/assign-part', [LaptopAssignmentController::class, 'storeAssignedPartUpgrade'])->name('assign.part.store');
 
     // Return Requests
-    Route::get('/return-requests', [ReturnRequestController::class, 'adminIndex'])->name('view-return-requests.index');
-    Route::patch('/return-requests/{id}/mark-received', [ReturnRequestController::class, 'markAsReceived'])->name('view-return-requests.mark-received');
-    Route::post('/return-requests/{id}/complete', [ReturnRequestController::class, 'complete'])->name('view-return-requests.complete');
-    Route::delete('/return-request/{id}/delete', [ReturnRequestController::class, 'delete'])->name('return.delete');
-
+    Route::get('/return-requests', [AdminReturnController::class, 'index'])->name('return.index');
+    Route::post('/return-requests/{id}/complete', [AdminReturnController::class, 'complete'])->name('return.complete');
+    Route::delete('/return-requests/{id}', [AdminReturnController::class, 'delete'])->name('return.delete');
 
     // History
-    Route::get('/history', [AdminController::class, 'history'])->name('history');
-
-    // Export Request
-    Route::get('/export-request', [LaptopRequestController::class, 'exportForm'])->name('export-request.form');
-    Route::post('/export-request/search', [LaptopRequestController::class, 'searchStaff'])->name('export-request.search');
-    Route::post('/export-request/export/{userId}', [LaptopRequestController::class, 'exportToExcel'])->name('export-request.generate');
-    Route::get('/export-requests', [LaptopRequestController::class, 'exportForm'])->name('export.form'); // New Line
-    Route::post('/export-selected', [LaptopRequestController::class, 'exportSelected'])->name('export.selected');
-    Route::post('/export-all', [LaptopRequestController::class, 'exportAllFiltered'])->name('export.all');
-
-
-    // Optional redirect
-    Route::get('/export-request-redirect', function () {
-        return redirect()->route('admin.export-request.form');
-    })->name('export-request');
+    Route::get('/history', [HistoryController::class, 'index'])->name('history');
 
     // Activities
     Route::get('/activities', [AdminController::class, 'viewActivities'])->name('activities');
+
+    // Export
+    Route::get('/export', [ExportController::class, 'exportForm'])->name('export.form');
+    Route::post('/export/selected', [ExportController::class, 'exportSelected'])->name('export.selected');
+    Route::post('/export/all', [ExportController::class, 'exportAllFiltered'])->name('export.all');
+    Route::post('/export/staff/{userId}', [ExportController::class, 'exportToExcel'])->name('export.staff');
 });
+
 
 /*
 |--------------------------------------------------------------------------
-| 👩‍💼 STAFF ROUTES
+| 👩‍💼 Staff Routes
 |--------------------------------------------------------------------------
 */
-
 Route::prefix('staff')->middleware(['auth', 'verified'])->name('staff.')->group(function () {
-
     // Dashboard
     Route::get('/dashboard', [StaffController::class, 'dashboard'])->name('dashboard');
 
-    // Laptop Request
-    Route::get('/make-request', [LaptopRequestController::class, 'create'])->name('make-request.create');
-    Route::post('/make-request', [LaptopRequestController::class, 'store'])->name('make-request.store');
-
-    // My Requests
-    Route::get('/request-history', [HandoverHistoryController::class, 'myHistory'])->name('request-history');
+    // Requests
+    Route::get('/requests', [StaffLaptopRequestController::class, 'index'])->name('requests.index');
+    Route::get('/make-request', [StaffLaptopRequestController::class, 'create'])->name('requests.create');
+    Route::post('/make-request', [StaffLaptopRequestController::class, 'store'])->name('requests.store');
 
     // Return Laptop
-    Route::get('/return-laptop', [ReturnRequestController::class, 'create'])->name('return-laptop.create');
-    Route::post('/return-laptop', [ReturnRequestController::class, 'store'])->name('return-laptop.store');
+    Route::get('/return-laptop', [StaffReturnController::class, 'create'])->name('return.create');
+    Route::post('/return-laptop', [StaffReturnController::class, 'store'])->name('return.store');
+
+    // Handover History
+    Route::get('/my-history', [StaffHandoverController::class, 'myHistory'])->name('history');
 });

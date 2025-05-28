@@ -41,8 +41,7 @@
                                     <div class="flex items-center justify-center gap-2">
 
                                         <!-- File Upload Form -->
-                                        <form action="{{ route('admin.view-return-requests.complete', $return->id) }}" 
-                                              method="POST" 
+                                        <form action="{{ route('admin.return.complete', $return->id) }}" 
                                               enctype="multipart/form-data" 
                                               onsubmit="return validateFileInput(this)" class="inline-flex items-center gap-2">
                                             @csrf
