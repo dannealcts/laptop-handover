@@ -7,6 +7,11 @@ use App\Models\LaptopRequest;
 use App\Models\Activity;
 use App\Models\HandoverHistory;
 use App\Models\ReturnRequest;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\UpgradeEligibilityMail;
+
 
 
 class AdminController extends Controller
@@ -33,13 +38,23 @@ class AdminController extends Controller
             ];
         });
 
+        $eligibleLaptops = Laptop::whereNotNull('purchase_date')
+        ->where('status', 'assigned')
+        ->with(['requests.user']) // eager load user via request
+        ->get()
+        ->filter(function ($laptop) {
+            return $laptop->isEligibleForUpgrade();
+        });
+
         return view('admin.dashboard', compact(
             'totalLaptops',
             'pendingRequests',
             'assignedDevices',
             'maintenanceDevices',
             'recentActivities',
-            'allActivities'
+            'allActivities',
+            'eligibleLaptops'
+            
         ));
     }
 
@@ -86,6 +101,26 @@ class AdminController extends Controller
 
         return view('admin.activities', compact('activities'));
         
+    }
+
+    public function notifyUpgrade($userId)
+    {
+        
+        $user = User::findOrFail($userId);
+
+        $latestRequest = LaptopRequest::where('user_id', $user->id)
+            ->whereNotNull('assigned_laptop_id')
+            ->whereIn('status', ['approved', 'assigned', 'completed'])
+            ->with('assignedLaptop')
+            ->orderByDesc('created_at')
+            ->first();
+
+        if ($latestRequest && $latestRequest->assignedLaptop) {
+            Mail::to($user->email)->send(new UpgradeEligibilityMail($user, $latestRequest->assignedLaptop));
+            return back()->with('success', 'Notification sent to ' . $user->name);
+        }
+
+        return back()->with('error', 'No assigned laptop found for this user.');
     }
 
 }

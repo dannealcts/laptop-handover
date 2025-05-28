@@ -8,7 +8,8 @@ use App\Http\Controllers\{
     LaptopRequestController,
     ReturnRequestController,
     AdminController,
-    HandoverHistoryController
+    HandoverHistoryController,
+    StaffController
 };
 
 /*
@@ -59,12 +60,11 @@ require __DIR__ . '/auth.php';
 
 Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(function () {
 
-    
+    Route::post('/notify-upgrade/{userId}', [AdminController::class, 'notifyUpgrade'])->name('notify-upgrade');
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
     // Laptop Inventory
     Route::resource('laptops', LaptopInvController::class)->names('laptops');
-
 
     // Laptop Requests
     Route::get('/view-requests', [LaptopRequestController::class, 'adminIndex'])->name('view-requests');
@@ -114,9 +114,8 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
 
 Route::prefix('staff')->middleware(['auth', 'verified'])->name('staff.')->group(function () {
 
-    Route::get('/dashboard', function () {
-        return view('staff.dashboard');
-    })->name('dashboard');
+    // Dashboard
+    Route::get('/dashboard', [StaffController::class, 'dashboard'])->name('dashboard');
 
     // Laptop Request
     Route::get('/make-request', [LaptopRequestController::class, 'create'])->name('make-request.create');

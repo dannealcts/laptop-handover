@@ -35,4 +35,9 @@ class Laptop extends Model
         return Carbon::parse($this->purchase_date)->addYears(5)->isPast();
     }
 
+    public function assignedUser()
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
+    }
+
 }
