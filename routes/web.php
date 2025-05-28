@@ -33,6 +33,9 @@ Route::get('/redirect-by-role', function () {
         : redirect()->route('staff.dashboard');
 })->middleware(['auth', 'verified']);
 
+Route::get('/admin/test-upgrade-mail/{userId}', [NotificationController::class, 'sendUpgradeEmail'])->name('admin.test-upgrade-mail');
+
+
 /*
 |--------------------------------------------------------------------------
 | 👤 Profile Management

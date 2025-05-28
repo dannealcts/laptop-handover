@@ -42,8 +42,10 @@
 
                                         <!-- File Upload Form -->
                                         <form action="{{ route('admin.return.complete', $return->id) }}" 
-                                              enctype="multipart/form-data" 
-                                              onsubmit="return validateFileInput(this)" class="inline-flex items-center gap-2">
+                                            method="POST"
+                                            enctype="multipart/form-data" 
+                                            onsubmit="return validateFileInput(this)" 
+                                            class="inline-flex items-center gap-2">
                                             @csrf
                                             <label class="inline-flex items-center space-x-2 border rounded px-2 py-1 bg-white shadow-sm hover:bg-gray-50 cursor-pointer text-sm">
                                                 <input type="file" 
