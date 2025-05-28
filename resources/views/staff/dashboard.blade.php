@@ -43,7 +43,7 @@
                 <!-- Action Cards -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
                     <!-- Make a Request -->
-                    <a href="{{ route('staff.make-request.create') }}"
+                    <a href="{{ route('staff.requests.create') }}"
                        class="bg-green-600 hover:bg-green-700 text-white font-semibold py-6 px-4 rounded-xl text-center shadow-md hover:shadow-xl transition transform hover:-translate-y-1">
                         <div class="flex flex-col items-center">
                             <i data-lucide="plus" class="w-6 h-6 mb-2"></i>
@@ -52,7 +52,7 @@
                     </a>
 
                     <!-- View My Requests -->
-                    <a href="{{ route('staff.request-history') }}"
+                    <a href="{{ route('staff.requests.index') }}"
                        class="bg-green-600 hover:bg-green-700 text-white font-semibold py-6 px-4 rounded-xl text-center shadow-md hover:shadow-xl transition transform hover:-translate-y-1">
                         <div class="flex flex-col items-center">
                             <i data-lucide="list-checks" class="w-6 h-6 mb-2"></i>
@@ -61,7 +61,7 @@
                     </a>
 
                     <!-- Return Laptop -->
-                    <a href="{{ route('staff.return-laptop.create') }}"
+                    <a href="{{ route('staff.return.create') }}"
                        class="bg-green-600 hover:bg-green-700 text-white font-semibold py-6 px-4 rounded-xl text-center shadow-md hover:shadow-xl transition transform hover:-translate-y-1">
                         <div class="flex flex-col items-center">
                             <i data-lucide="undo" class="w-6 h-6 mb-2"></i>
@@ -81,7 +81,7 @@
                             <strong>{{ \Carbon\Carbon::parse($eligibleLaptop->purchase_date)->format('d M Y') }}</strong>.
                         </p>
                         <p class="mb-4">You are eligible for a laptop upgrade under the 5-year replacement policy.</p>
-                        <a href="{{ route('staff.make-request.create') }}"
+                        <a href="{{ route('staff.requests.create') }}"
                            class="inline-block bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-semibold px-4 py-2 rounded shadow">
                             Make Upgrade Request
                         </a>

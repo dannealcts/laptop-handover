@@ -12,25 +12,25 @@
                     Dashboard
                 </a>
 
-                <a href="{{ route('staff.make-request.create') }}"
+                <a href="{{ route('staff.requests.create') }}"
                    class="px-4 py-2 rounded-md transition
-                          {{ request()->routeIs('staff.make-request.create') 
+                          {{ request()->routeIs('staff.requests.create') 
                               ? 'bg-green-100 text-green-700 font-semibold shadow-sm' 
                               : 'hover:bg-gray-100' }}">
                     Make Request
                 </a>
 
-                <a href="{{ route('staff.request-history') }}"
+                <a href="{{ route('staff.requests.index') }}"
                    class="px-4 py-2 rounded-md transition
-                          {{ request()->routeIs('staff.request-history') 
+                          {{ request()->routeIs('staff.requests.index') 
                               ? 'bg-green-100 text-green-700 font-semibold shadow-sm' 
                               : 'hover:bg-gray-100' }}">
                     Request History
                 </a>
 
-                <a href="{{ route('staff.return-laptop.create') }}"
+                <a href="{{ route('staff.return.create') }}"
                    class="px-4 py-2 rounded-md transition
-                          {{ request()->routeIs('staff.return-laptop.create') 
+                          {{ request()->routeIs('staff.return.create') 
                               ? 'bg-green-100 text-green-700 font-semibold shadow-sm' 
                               : 'hover:bg-gray-100' }}">
                     Return Request

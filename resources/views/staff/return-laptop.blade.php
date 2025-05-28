@@ -29,7 +29,7 @@
                     <p class="text-red-600">You currently have no assigned laptops to return.</p>
                 @else
                     <!-- Form -->
-                    <form method="POST" action="{{ route('staff.return-laptop.store') }}" class="space-y-5">
+                    <form method="POST" action="{{ route('staff.return.store') }}" class="space-y-5">
                         @csrf
 
                         <!-- Select Laptop -->
