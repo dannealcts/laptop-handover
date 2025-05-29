@@ -65,11 +65,11 @@
             </div>
 
             <!-- Eligible for Upgrade Section -->
-            @if ($eligibleLaptops->count())
-                <div class="w-full mt-10">
-                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Laptops Eligible for Upgrade</h3>
+            <div class="w-full mt-10">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Laptops Eligible for Upgrade</h3>
 
-                    <div class="shadow-md rounded bg-white p-6 overflow-auto">
+                <div class="shadow-md rounded bg-white p-6 overflow-auto">
+                    @if ($eligibleLaptops->count())
                         <table class="w-full text-sm text-left border rounded">
                             <thead class="bg-red-50 text-red-700 uppercase text-xs tracking-wider">
                                 <tr>
@@ -121,9 +121,11 @@
                                 @endforeach
                             </tbody>
                         </table>
-                    </div>
+                    @else
+                        <p class="text-center text-gray-500 italic">No eligible laptops for upgrade.</p>
+                    @endif
                 </div>
-            @endif
+            </div>
         </main>
     </div>
 </x-app-layout>
