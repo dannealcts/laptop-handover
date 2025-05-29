@@ -69,13 +69,14 @@
                 <div class="w-full mt-10">
                     <h3 class="text-xl font-semibold text-gray-800 mb-4">Laptops Eligible for Upgrade</h3>
 
-                    <div class="shadow-md rounded bg-white p-6">
+                    <div class="shadow-md rounded bg-white p-6 overflow-auto">
                         <table class="w-full text-sm text-left border rounded">
                             <thead class="bg-red-50 text-red-700 uppercase text-xs tracking-wider">
                                 <tr>
                                     <th class="px-4 py-3 border-b">Tag No</th>
                                     <th class="px-4 py-3 border-b">Purchase Date</th>
                                     <th class="px-4 py-3 border-b">Assigned User</th>
+                                    <th class="px-4 py-3 border-b">Status</th>
                                     <th class="px-4 py-3 border-b text-center">Action</th>
                                 </tr>
                             </thead>
@@ -86,29 +87,30 @@
                                         <td class="px-4 py-2">
                                             {{ \Carbon\Carbon::parse($laptop->purchase_date)->format('d M Y') }}
                                         </td>
-                                        <td class="px-4 py-2">
-                                            {{
-                                                optional(
-                                                    $laptop->requests
-                                                        ->whereIn('status', ['approved', 'assigned', 'completed'])
-                                                        ->sortByDesc('created_at')
-                                                        ->first()
-                                                )?->user->name ?? '-'
-                                            }}
-                                        </td>
                                         @php
                                             $latestRequest = $laptop->requests
                                                 ->whereIn('status', ['approved', 'assigned', 'completed'])
                                                 ->sortByDesc('created_at')
                                                 ->first();
+                                            $assignedUser = $latestRequest?->user;
+                                            $status = $laptop->upgrade_notification_status ?? 'not_notified';
                                         @endphp
-
+                                        <td class="px-4 py-2">
+                                            {{ $assignedUser->name ?? '-' }}
+                                        </td>
+                                        <td class="px-4 py-2">
+                                            <span class="inline-block px-2 py-1 text-xs font-semibold rounded
+                                                {{ $status === 'notified' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700' }}">
+                                                {{ $status === 'notified' ? 'Notified' : 'Not Notified' }}
+                                            </span>
+                                        </td>
                                         <td class="px-4 py-2 text-center">
-                                            @if ($latestRequest && $latestRequest->user)
-                                                <form method="POST" action="{{ route('admin.notify-upgrade', $latestRequest->user->id) }}">
+                                            @if ($assignedUser)
+                                                <form method="POST" action="{{ route('admin.notify-upgrade', $laptop->id) }}">
                                                     @csrf
-                                                    <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm shadow">
-                                                        Notify
+                                                    <button type="submit" class="px-4 py-1 text-sm font-medium rounded shadow text-white
+                                                        {{ $status === 'notified' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-blue-500 hover:bg-blue-600' }}">
+                                                        {{ $status === 'notified' ? 'Re-notify' : 'Notify' }}
                                                     </button>
                                                 </form>
                                             @else
