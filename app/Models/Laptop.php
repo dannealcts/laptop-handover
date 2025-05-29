@@ -18,6 +18,7 @@ class Laptop extends Model
         'specs',
         'status',
         'purchase_date',
+        'upgrade_notification_status',
     
     ];
 

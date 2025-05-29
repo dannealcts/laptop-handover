@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Laptop;
 use App\Models\LaptopRequest;
 use App\Models\Activity;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\UpgradeNotification;
 
 class AdminController extends Controller
 {

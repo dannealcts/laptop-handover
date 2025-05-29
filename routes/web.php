@@ -63,7 +63,7 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
     
     // Dashboard
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
-    Route::post('/notify-upgrade/{userId}', [NotificationController::class, 'sendUpgradeEmail'])->name('notify-upgrade');
+    //Route::post('/notify-upgrade/{userId}', [NotificationController::class, 'sendUpgradeEmail'])->name('notify-upgrade');
 
     // Laptop Inventory (This uses the correct resource routes)
     Route::resource('laptops', LaptopInvController::class)->names('laptops');
@@ -96,6 +96,9 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
     Route::post('/export/selected', [ExportController::class, 'exportSelected'])->name('export.selected');
     Route::post('/export/all', [ExportController::class, 'exportAllFiltered'])->name('export.all');
     Route::post('/export/staff/{userId}', [ExportController::class, 'exportToExcel'])->name('export.staff');
+
+    Route::post('/notify-upgrade/{id}', [NotificationController::class, 'notifyUpgrade'])->name('notify-upgrade');
+
 });
 
 
