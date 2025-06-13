@@ -123,7 +123,7 @@
                         <!-- Upload File -->
                         <div class="mb-6">
                             <label for="signed_form" class="block font-medium text-gray-700">
-                                Upload Signed Request Form (PDF/Image)
+                                Upload Signed Request Form (PDF)
                             </label>
                             <input type="file" name="signed_form" accept=".pdf,.png,.jpg,.jpeg"
                                    class="w-full mt-1 border-gray-300 rounded-md" required>

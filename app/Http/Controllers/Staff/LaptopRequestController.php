@@ -94,7 +94,13 @@ class LaptopRequestController extends Controller
             'signed_form' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
-        $signedFormPath = $request->file('signed_form')->store('signed_forms', 'public');
+        $user = Auth::user();
+        $timestamp = now()->format('Ymd_His');
+
+        $originalExtension = $request->file('signed_form')->getClientOriginalExtension();
+        $filename = strtolower(str_replace(' ', '_', $user->name)) . "_request_{$timestamp}." . $originalExtension;
+
+        $signedFormPath = $request->file('signed_form')->storeAs('signed_forms', $filename, 'public');
 
         $assignedLaptop = LaptopRequest::where('user_id', Auth::id())
             ->where('status', 'completed')
